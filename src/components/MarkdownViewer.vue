@@ -1,7 +1,5 @@
 <template>
     <div v-html="compiledMarkdown" id="compiled-markdown">
-        <div>Title</div>
-        <div>asdasd</div>
     </div>
 
 </template>
@@ -88,7 +86,7 @@ export default {
   border: 1px solid #BDBDBD;
 }
 
-code {
+#markdown-container code {
     background-color: #2d2d2d;
     color: #cccccc;
     font-family: Consolas, "Courier new";
@@ -96,6 +94,29 @@ code {
     border-radius: 4px;
     font-size: 90%;
 }
+
+#markdown-container blockquote {
+  background-color: #F5F5F5;
+  box-shadow: 0 3px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,0.24);
+  padding: 5px 25px 5px 60px;
+  padding-left
+  line-height: 1.2;
+  text-align: justify;
+  border-left: 6px solid #1A8DFF;
+  position: relative;
+  min-height: 54px;
+}
+
+#markdown-container blockquote::before{
+  content: "\201C";
+  font-family: Georgia, serif;
+  font-size: 60px;
+  font-weight: bold;
+  color: #999;
+  position: absolute;
+  left: 10px;
+  top: 5px;
+  }
 
 .hljs-emphasis {
   font-style: italic;

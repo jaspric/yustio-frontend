@@ -80,8 +80,9 @@ export default{
 }
 
 .post-summary{
-    padding: 0 .7em .75em e2m;
+    padding: 0 .7em .75em 2em;
     color: #263238;
+    text-align: justify;
 }
 
 .post-footer{

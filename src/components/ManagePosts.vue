@@ -1,11 +1,12 @@
 <template>
     <div id="manage-posts">
+        <modal-box v-if="showDeleteModal" :post="postInForm" @close="showDeleteModal = false" @remove="removePost"></modal-box>
         <div id="manage-posts-header">
             <h1>Manage Posts</h1>
         </div>
         <div id="manage-posts-body">
             <div id="edit-post">
-                <add-post :post="postInForm" @submit="onFormSubmit" @input="compileMarkdown" @cancel="resetPostInForm" @save="saveDraft" @remove="removePost"></add-post>
+                <add-post :post="postInForm" @submit="onFormSubmit" @input="compileMarkdown" @cancel="resetPostInForm" @save="saveDraft" @remove="removeCheck"></add-post>
             </div>
             <div id="markdown-container">
                 <markdown-viewer :compiledMarkdown="compiledMarkdown"></markdown-viewer>
@@ -18,6 +19,8 @@
             </div>
             <div id="entry-list">
                 <h1>Entries</h1>
+                <span><strong>Sort by: </strong></span> 
+                <a @click="sortPosts('date')" class="sort-link">Date</a> | <a @click="sortPosts('author')" class="sort-link">Author</a> | <a @click="sortPosts('title')" class="sort-link">Title</a>
                 <post-list :posts="posts" @edit="onEditClicked"></post-list>
             </div>
         </div>
@@ -29,7 +32,11 @@ import AddPost from './AddPost'
 import PostList from './PostList'
 import MarkdownViewer from './MarkdownViewer'
 import DraftList from './DraftList'
+import ModalBox from './ModalBox'
 
+import uuid from 'uuid';
+
+require('smoothscroll-polyfill').polyfill();
 var hljs = require('highlight.js');
 var axios = require('axios')
 var md = require('markdown-it')({
@@ -57,48 +64,14 @@ const initialData = () => {
             summary: '',
             body: '',
             tags: '',
-            isActive: false
+            isActive: false,
+            isDraft: false
         },
-        posts: [
-                {
-                    title: "Reasons why my girlfriend is the best",
-                    summary: 'A few reasons why she is amazing.',
-                    body: '## Reasons why my girlfriend is the best\n* Makes me smile and laugh every day\n* Is gorgeous\n* Is my best friend\n* Loves Dogs\n* Loves Tacos\n* Is passionate and driven\n* Laughs at my dumb jokes',
-                    author: 'Jason',
-                    date: '2015-06-03 6:32 PM',
-                    id: 1,
-                    isActive: false
-                },
-                {
-                    title: 'How to make a blog with Vue 2',
-                    summary: 'An in-depth, well thought out guide designed to help you create better a better blog.',
-                    body: '# Refer to tutorials\n---',
-                    author: 'Blog Person',
-                    date: '2012-06-21 4:17 AM',
-                    id: 2,
-                    isActive: false
-                },
-                {
-                    title: 'Peanut Butter OR Jelly - How to Make Better Decisions',
-                    summary: 'In this article, Line explains creative ways to make swift, concise decisions.',
-                    body: '# Its Peanut Butter Jelly Time',
-                    author: 'Border H. Line',
-                    date: '2013-10-03 5:34 PM',
-                    id: 3,
-                    isActive: false
-                },
-                {
-                    title: 'New Frameworks',
-                    summary: "It may take a little bit of persistence to learn a new framework, and it doesn't always seem like it will pay off in the end, but once you get a flow going, it's totally worth it.",
-                    body: '# test',
-                    author: 'Jason',
-                    date: '2017-01-05 5:23 PM',
-                    id: 4,
-                    isActive: false
-                } 
-        ],
+        posts: [],
         drafts: [],
-        compiledMarkdown: ''
+        compiledMarkdown: '',
+        showDeleteModal: false,
+        sortOrder: 'desc'
     }
 }
 
@@ -107,17 +80,16 @@ export default {
         PostList,
         AddPost,
         MarkdownViewer,
-        DraftList
+        DraftList,
+        ModalBox
     },
     mounted(){
-        axios.get('http://192.168.1.107:5000/api/blog/posts')
-            .then(response => 
-                    for(var i=0; i < response.data.length; i++){
-                        reponse.data[i].isActive = false;
-                    };
-                    console.log(response.data)
-                );
-            
+        this.getPosts()
+        var draftCookie = JSON.parse(this.getCookie('drafts'))
+        draftCookie.forEach((draft) => {
+            draft.isActive = false;
+            this.drafts.push(draft)
+        })
     },
     data: initialData,
     methods: {
@@ -128,6 +100,7 @@ export default {
             if (index !== -1){
                 this.posts.splice(index, 1, post)
                 this.resetPostInForm();
+                
             } else {
                 if(post.title != '' && post.summary != '' && post.body != ''){
                     this.posts.push(post);
@@ -162,43 +135,150 @@ export default {
             post.isActive = true;
             this.postInForm = { ...post };
             this.compileMarkdown(this.postInForm.body);
+            var scrollPos = window.pageYOffset;
+            document.querySelector('header').scrollIntoView({ behavior: 'smooth' });
         },
         saveDraft(draft){
-            const index = this.drafts.findIndex((p) => p.title === draft.title);
+            draft.isDraft = true;
 
-            console.log(index)
+            if(draft.id){
+                const index = this.drafts.findIndex((p) => p.id === draft.id);
 
-            if (index !== -1){
-                this.drafts.splice(index, 1, draft)
-                this.resetPostInForm();
+                if (index !== -1){
+                    this.drafts.splice(index, 1, draft)
+                    this.resetPostInForm();
+                }
             } else {
-                this.drafts.push(draft);
-                this.resetPostInForm();
+                    draft.id = uuid.v4();
+                    this.drafts.push(draft);
+                    this.resetPostInForm();
+                    this.createDraftCookie(this.drafts)
             }
         },
         removePost(post){
             const pindex = this.posts.findIndex((p) => p.id === post.id);
-            const dindex = this.drafts.findIndex((p) => p.title === post.title);
+            const dindex = this.drafts.findIndex((p) => p.id === post.id);
 
-            if(post.id){
+            if(!post.isDraft){
                 if (pindex !== -1){
                     this.posts.splice(pindex, 1)
                 }
             } else {
                 if (dindex !== -1){
                     this.drafts.splice(dindex, 1)
+                    this.createDraftCookie(this.drafts)
                 }
             }
-            this.resetPostInForm();
-        },
-        getData: function(){
+            this.resetPostInForm()
+            this.showDeleteModal = false
             
         },
+        removeCheck(post){
+            this.showDeleteModal = true
+        },
+        createDraftCookie(drafts){
+            var userDrafts = JSON.stringify(drafts)
+            this.createCookie('drafts', userDrafts)
+        },
+        createCookie: function(name, value, days) {
+            var expires;
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toGMTString();
+            }
+            else {
+                expires = "";
+            }
+            document.cookie = name + "=" + value + expires + "; path=/";
+        },
+        getCookie: function(c_name) {
+            if (document.cookie.length > 0) {
+                var c_start = document.cookie.indexOf(c_name + "=");
+                if (c_start != -1) {
+                    c_start = c_start + c_name.length + 1;
+                    var c_end = document.cookie.indexOf(";", c_start);
+                    if (c_end == -1) {
+                        c_end = document.cookie.length;
+                    }
+                    return unescape(document.cookie.substring(c_start, c_end));
+                }
+            }
+            return "";
+        },
+        getPosts: function(){
+            axios.get('http://192.168.1.107:5000/api/blog/posts')
+                .then((response) => {
+                    response.data.sort(function(a, b){
+                        if(a.created < b.created) return -1;
+                        if(a.created > b.created) return 1;
+                        return 0;
+                    }).reverse()
+                    response.data.forEach((post) => {
+                        post.isActive = false;
+                        this.posts.push(post)
+                        })
+                });
+        },
+        sortPosts: function(method){
+            if(!method || method == 'date'){
+                if(this.sortOrder == 'desc'){
+                    this.sortOrder = 'asc'
+                    return this.posts.sort(function(a,b){
+                        if(a.created < b.created) return -1;
+                        if(a.created > b.created) return 1;
+                        return 0;
+                    })
+                } else {
+                    this.sortOrder = 'desc'
+                    return this.posts.sort(function(a,b){
+                        if(a.created > b.created) return -1;
+                        if(a.created < b.created) return 1;
+                        return 0;
+                    })
+                }
+            }
+            if(method == 'title'){
+                if(this.sortOrder == 'desc'){
+                    this.sortOrder = 'asc'
+                    return this.posts.sort(function(a,b){
+                        if(a.title < b.title) return -1;
+                        if(a.title > b.title) return 1;
+                        return 0;
+                    })
+                } else {
+                    this.sortOrder = 'desc'
+                    return this.posts.sort(function(a,b){
+                        if(a.title > b.title) return -1;
+                        if(a.title < b.title) return 1;
+                        return 0;
+                    })
+                }
+            }
+            if(method == 'author'){
+               if(this.sortOrder == 'desc'){
+                    this.sortOrder = 'asc'
+                    return this.posts.sort(function(a,b){
+                        if(a.author < b.author) return -1;
+                        if(a.author > b.author) return 1;
+                        return 0;
+                    })
+                } else {
+                    this.sortOrder = 'desc'
+                    return this.posts.sort(function(a,b){
+                        if(a.author > b.author) return -1;
+                        if(a.author < b.author) return 1;
+                        return 0;
+                    })
+                }
+            }
+        }
     }
 }
 </script>
 
 <style>
+
 #manage-posts-header{
     padding-top: 10px;
     font-size: 1.2em;
@@ -248,6 +328,13 @@ export default {
     text-align: center;
 }
 
+#entry-list>a{
+    color: black;
+}
+
+.sort-link{
+    cursor: pointer;
+}
 @media only screen 
   and (max-device-width: 1024px) {
     #edit-post, #manage-posts-header{

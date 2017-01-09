@@ -5,15 +5,15 @@
                 <div></div>
                 <a href="#"><h2 id="brand">yust.io</h2></a>
                 <ul id="nav-items">
-                    <router-link to="home" exact><li class="nav-item">Home</li></router-link>
-                    <router-link to="about" exact><li class="nav-item">About</li></router-link>
-                    <router-link to="post-archive" exact><li class="nav-item">Archive</li></router-link>
-                    <router-link to="manage-posts" exact><li class="nav-item">Manage Posts</li></router-link>
+                    <router-link to="home" tag="li" class="nav-item" exact><a>Home</a></router-link>
+                    <router-link to="about" tag="li" class="nav-item" exact><a>About</a></router-link>
+                    <router-link to="post-archive" tag="li" class="nav-item" exact><a>Archive</a></router-link>
+                    <router-link v-if="user.isAdmin" to="manage-posts" tag="li" class="nav-item" exact><a>Manage Posts</a></router-link>
                 </ul>
-                <div id="login">
-                    <span v-if="loggedIn">Jason | <span><a href="#">Logout</a></span></span>
-                    <span v-else><a href="#">Login</a></span>
-                </div>
+                <ul id="nav-items">
+                    <router-link v-if="user.isAuthenticated" to="logout" tag="li" class="nav-item"><span v-if="user.isAuthenticated"><a>Logout</a></span></router-link>
+                    <router-link v-else to="login" tag="li" class="nav-item"><span><a>Login</a></span></router-link>
+                </ul>
             </div>
         </div>
     </header>
@@ -21,7 +21,7 @@
 
 <script>
 export default{
-
+    props: ['user']
 }
 </script>
 
@@ -82,6 +82,10 @@ a:hover{
 
 .nav-item:hover, .nav-item:active{
     box-shadow: 0 -4px 0 0 #1A8DFF inset;
+}
+
+.router-link-active{
+     box-shadow: 0 -4px 0 0 #1A8DFF inset;
 }
 
 @media only screen 

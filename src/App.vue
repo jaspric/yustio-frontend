@@ -1,6 +1,6 @@
 <template>
   <main class="container">
-    <app-nav></app-nav>
+    <app-nav :user="user"></app-nav>
     <router-view></router-view>
   </main>
 </template>
@@ -8,6 +8,15 @@
 <script>
 import AppNav from './components/AppNav'
 export default {
+  data: function() {
+        return{ 
+            user: {
+                name: 'Yust',
+                isAuthenticated: false,
+                isAdmin: false
+            }
+        }
+  },
   components: {
     AppNav
   }

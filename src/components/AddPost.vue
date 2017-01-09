@@ -2,11 +2,11 @@
         <form id="blog-post-entry">
             <div class="form-group">
                 <!-- <label for="postTitle" class="input-label">Post title</label> -->
-                <input type="text" v-model="post.title" class="input-text" id="postTitle" placeholder="Enter the title of the post.">
+                <input type="text" v-model="post.title" class="input-text" id="postTitle" placeholder="Title">
             </div>
             <div class="form-group">
                 <!-- <label for="postSummary" class="input-label">Post summary</label> -->
-                <input type="text" v-model="post.summary" class="input-text" id="postSummary" placeholder="Enter a short summary for the post.">
+                <input type="text" v-model="post.summary" class="input-text" id="postSummary" placeholder="Summary">
             </div>
             <div class="form-group">
                  <textarea v-model="post.body" @input="markdownPreview" id="post-body" rows="12" columns="100" placeholder="Start typing..."></textarea> 
@@ -16,10 +16,10 @@
                 <input type="text" v-model="post.tags" class="input-text" id="tags" placeholder="Tags">
             </div>
             <div id="post-button-holder">
-                <button type="submit" v-if="post.title && post.summary && post.body" @click.prevent="onSubmit" id="post-submit">{{ post.id ? 'Update Post' : 'Add Post' }}</button>
-                <button type="submit" v-if="post.body && post.title && post.id == null" @click.prevent="saveDraft" id="post-save">Save Draft</button>
+                <button type="submit" v-if="post.title && post.summary && post.body" @click.prevent="onSubmit" id="post-submit">{{ post.isDraft ? 'Add Post' : 'Update Post' }}</button>
+                <button type="submit" v-if="post.isDraft || (post.id == null && post.title && post.summary && post.body)" @click.prevent="saveDraft" id="post-save">Save Draft</button>
                 <button type="submit" v-if="post.title || post.id || post.body || post.summary || post.tags" @click.prevent="cancelPost" id="post-cancel">Cancel</button>
-                <button type="submit" v-if="(post.title && post.body) || post.id" @click.prevent="removePost" id="post-delete">{{ post.id ? 'Delete Post' : 'Delete Draft'}}</button>
+                <button type="submit" v-if="post.id" @click.prevent="removePost" id="post-delete">{{ post.isDraft ? 'Delete Draft' : 'Delete Post'}}</button>
             </div>
         </form>
 </template>
@@ -33,12 +33,12 @@ export default {
     methods: {
         onSubmit(){
             this.post.author = 'Yust Test';
-            this.post.date = moment().format('MMM DD, YYYY [ at ] hh:mm a')
+            this.post.created = moment().format('MMM DD, YYYY [ at ] hh:mm a')
             this.$emit('submit', this.post);
         },
         saveDraft(){
             this.post.author = 'Yust Test';
-            this.post.date = moment().format('MMM DD, YYYY [ at ] hh:mm a')
+            this.post.created = moment().format('MMM DD, YYYY [ at ] hh:mm a')
             this.$emit('save', this.post);
         },
         markdownPreview(){
@@ -93,57 +93,55 @@ input, label{
     min-height: 100px;
 }
 
-
-
-#post-submit{
-    background-color: #2196F3;
-    box-shadow: 0 -5px 0 0 #1976D2 inset;
-}
-
-#post-save{
+#post-save, .save{
     background-color: #4CAF50;
     box-shadow: 0 -5px 0 0 #388E3C inset;
 }
 
-#post-save:hover{
+#post-save:hover, .save:hover{
     background-color: #66BB6A;
 }
 
-#post-save:active{
+#post-save:active, .save:active{
     box-shadow: 0 -2px 0 0 #388E3C inset;
 }
 
-#post-delete{
+#post-delete, .delete{
     background-color: #e53935;
     box-shadow: 0 -5px 0 0 #c62828 inset;  
 }
 
-#post-delete:hover{
+#post-delete:hover, .delete:hover{
     background-color: #e57373;
 }
 
-#post-delete:active{
+#post-delete:active, .delete:active{
     box-shadow: 0 -2px 0 0 #c62828 inset;
 }
 
-#post-submit:hover{
+#post-submit, .submit{
+    background-color: #2196F3;
+    box-shadow: 0 -5px 0 0 #1976D2 inset;
+}
+
+#post-submit:hover, .submit:hover{
     background-color: #42A5F5;
 }
 
-#post-submit:active{
+#post-submit:active, .submit:active{
     box-shadow: 0 -2px 0 0 #1976D2 inset;
 }
 
-#post-cancel{
+#post-cancel, .cancel{
     background-color: #FF7043;
     box-shadow: 0 -5px 0 0 #FF5722 inset;  
 }
 
-#post-cancel:hover{
+#post-cancel:hover, .cancel:hover{
     background-color: #FF8A65;
 }
 
-#post-cancel:active{
+#post-cancel:active, .cancel:active{
    box-shadow: 0 -2px 0 0 #FF5722 inset;
 }
 
