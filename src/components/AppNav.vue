@@ -2,17 +2,13 @@
     <header>
         <div id="nav-container">
             <div id="nav">
-                <div></div>
                 <a href="#"><h2 id="brand">yust.io</h2></a>
                 <ul id="nav-items">
                     <router-link to="home" tag="li" class="nav-item" exact><a>Home</a></router-link>
                     <router-link to="about" tag="li" class="nav-item" exact><a>About</a></router-link>
                     <router-link to="post-archive" tag="li" class="nav-item" exact><a>Archive</a></router-link>
                     <router-link v-if="user.isAdmin" to="manage-posts" tag="li" class="nav-item" exact><a>Manage Posts</a></router-link>
-                </ul>
-                <ul id="nav-items">
                     <router-link v-if="user.isAuthenticated" to="logout" tag="li" class="nav-item"><span v-if="user.isAuthenticated"><a>Logout</a></span></router-link>
-                    <router-link v-else to="login" tag="li" class="nav-item"><span><a>Login</a></span></router-link>
                 </ul>
             </div>
         </div>

@@ -5,10 +5,6 @@
                 <input type="text" v-model="post.title" class="input-text" id="postTitle" placeholder="Title">
             </div>
             <div class="form-group">
-                <!-- <label for="postSummary" class="input-label">Post summary</label> -->
-                <input type="text" v-model="post.summary" class="input-text" id="postSummary" placeholder="Summary">
-            </div>
-            <div class="form-group">
                  <textarea v-model="post.body" @input="markdownPreview" id="post-body" rows="12" columns="100" placeholder="Start typing..."></textarea> 
             </div>
             <div class="form-group">
@@ -16,10 +12,10 @@
                 <input type="text" v-model="post.tags" class="input-text" id="tags" placeholder="Tags">
             </div>
             <div id="post-button-holder">
-                <button type="submit" v-if="post.title && post.summary && post.body" @click.prevent="onSubmit" id="post-submit">{{ post.isDraft ? 'Add Post' : 'Update Post' }}</button>
-                <button type="submit" v-if="post.isDraft || (post.id == null && post.title && post.summary && post.body)" @click.prevent="saveDraft" id="post-save">Save Draft</button>
-                <button type="submit" v-if="post.title || post.id || post.body || post.summary || post.tags" @click.prevent="cancelPost" id="post-cancel">Cancel</button>
-                <button type="submit" v-if="post.id" @click.prevent="removePost" id="post-delete">{{ post.isDraft ? 'Delete Draft' : 'Delete Post'}}</button>
+                <button type="submit" v-if="post.title && post.body" @click.prevent="onSubmit" id="post-submit">{{ post.entry_id ? 'Update Post' : 'Add Post' }}</button>
+                <button type="submit" v-if="post.isDraft || (post.entry_id == null && post.title && post.body)" @click.prevent="saveDraft" id="post-save">Save Draft</button>
+                <button type="submit" v-if="post.title || post.entry_id || post.body || post.summary || post.tags" @click.prevent="cancelPost" id="post-cancel">Cancel</button>
+                <button type="submit" v-if="post.id || post.entry_id" @click.prevent="removePost" id="post-delete">{{ post.isDraft ? 'Delete Draft' : 'Delete Post'}}</button>
             </div>
         </form>
 </template>
@@ -33,7 +29,6 @@ export default {
     methods: {
         onSubmit(){
             this.post.author = 'Yust Test';
-            this.post.created = moment().format('MMM DD, YYYY [ at ] hh:mm a')
             this.$emit('submit', this.post);
         },
         saveDraft(){
@@ -81,7 +76,7 @@ input, label{
     resize: none;
     font-family: Consolas, "Courier new";
     margin-top: 20px;
-    height: 370px;
+    height: 565px;
     overflow-y: auto;
 }
 #post-button-holder{

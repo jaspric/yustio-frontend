@@ -37,8 +37,13 @@ import ModalBox from './ModalBox'
 import uuid from 'uuid';
 
 require('smoothscroll-polyfill').polyfill();
+var removeMd = require('remove-markdown');
 var hljs = require('highlight.js');
+
 var axios = require('axios')
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.put['Content-Type'] = 'application/json';
+
 var md = require('markdown-it')({
   html: true,
   linkify: true,
@@ -85,30 +90,58 @@ export default {
     },
     mounted(){
         this.getPosts()
-        var draftCookie = JSON.parse(this.getCookie('drafts'))
-        draftCookie.forEach((draft) => {
-            draft.isActive = false;
-            this.drafts.push(draft)
-        })
+        if(this.getCookie('drafts')){
+            var draftCookie = JSON.parse(this.getCookie('drafts'))
+            draftCookie.forEach((draft) => {
+                draft.isActive = false;
+                this.drafts.push(draft)
+            })
+        }
     },
     data: initialData,
     methods: {
 
         onFormSubmit(post) {
-            const index = this.posts.findIndex((p) => p.id === post.id);
-            console.log(this.posts)
-            if (index !== -1){
-                this.posts.splice(index, 1, post)
+            var self = this;
+            if(post.isDraft){
                 this.resetPostInForm();
-                
-            } else {
-                if(post.title != '' && post.summary != '' && post.body != ''){
-                    this.posts.push(post);
+                this.removePost(post);
+                post.id = "";
+                var json_post = JSON.stringify(post);
+                axios.post('http://192.168.1.107:5000/api/blog/posts', json_post)
+                    .then(function (response){
+                        self.getPosts()
+                    })
+            }else{
+                const index = this.posts.findIndex((p) => p.id === post.id);
+                if (index !== -1){
+                    console.log('this is a post')
                     this.resetPostInForm();
-                }
-                else{
-                    console.log('title is null')
-                    console.log(JSON.stringify(post))
+                    var json_post = JSON.stringify(post);
+                    var url = 'http://192.168.1.107:5000/api/blog/posts/' + post.entry_id
+                    axios.put(url, json_post)
+                    .then(function (response){
+                        self.getPosts()
+                    })
+                    
+                } else {
+                    if(post.title != '' && post.body != ''){
+                        console.log('this is going too')
+                        this.resetPostInForm();
+                        post.id = "";
+                        post = JSON.stringify(post)
+                        console.log(post)
+                        axios.post('http://192.168.1.107:5000/api/blog/posts', post)
+                            .then(function (response){
+                                console.log(response + ' success');
+                                self.getPosts()
+                            })
+
+                    }
+                    else{
+                        console.log('title is null')
+                        console.log(JSON.stringify(post))
+                    }
                 }
             }
         },
@@ -140,7 +173,8 @@ export default {
         },
         saveDraft(draft){
             draft.isDraft = true;
-
+            draft.isActive = false;
+            draft.summary = removeMd(draft.body).substring(0, 139) + '...'
             if(draft.id){
                 const index = this.drafts.findIndex((p) => p.id === draft.id);
 
@@ -156,12 +190,20 @@ export default {
             }
         },
         removePost(post){
-            const pindex = this.posts.findIndex((p) => p.id === post.id);
+            const pindex = this.posts.findIndex((p) => p.id === post.entry_id);
             const dindex = this.drafts.findIndex((p) => p.id === post.id);
 
             if(!post.isDraft){
-                if (pindex !== -1){
+                if (pindex == -1){
+                    console.log('deleting post')
                     this.posts.splice(pindex, 1)
+                    var url = 'http://192.168.1.107:5000/api/blog/posts/' + post.entry_id
+                    var self = this
+                    axios.delete(url)
+                            .then(function (response){
+                                console.log(response + ' success');
+                                self.getPosts()
+                            })
                 }
             } else {
                 if (dindex !== -1){
@@ -207,6 +249,8 @@ export default {
             return "";
         },
         getPosts: function(){
+            this.posts = []
+            console.log('getting posts...')
             axios.get('http://192.168.1.107:5000/api/blog/posts')
                 .then((response) => {
                     response.data.sort(function(a, b){
@@ -215,6 +259,7 @@ export default {
                         return 0;
                     }).reverse()
                     response.data.forEach((post) => {
+                        post.summary = removeMd(post.body).substring(0, 139) + '...'
                         post.isActive = false;
                         this.posts.push(post)
                         })
@@ -314,18 +359,26 @@ export default {
     display: flex;
     width: 100%;
     margin-top: 20px;
-    justify-content: center;
+    justify-content: space-between;
     align-content: space-between;
     flex-flow: row wrap;
 }
-
+#posts, #drafts{
+    height: 750px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
 #draft-list, #entry-list{
-    margin: 20px;
-    width: 45%;
+    width: 50%;
+
 }
 
 #draft-list>h1, #entry-list>h1{
     text-align: center;
+}
+
+#draft-list>h1{
+    margin-bottom: 25px;
 }
 
 #entry-list>a{

@@ -32,11 +32,13 @@ export default{
 
 <style>
 #posts{
-    width: 100%;
+    width: 95%;
+    margin: 0 auto;
+
 }
 
 .post-container{
-    width: 100%;
+    width: 95%;
     margin: 2em auto;
     padding:  0;
     background-color: #ECEFF1;
