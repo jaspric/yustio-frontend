@@ -8,6 +8,7 @@ import VueResource from 'vue-resource'
 
 import AllPosts from './components/AllPosts';
 import ManagePosts from './components/ManagePosts';
+import FrontPage from './components/FrontPage';
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
@@ -15,8 +16,9 @@ Vue.use(VueResource)
 var axios = require('axios')
 
 const routes = [
-    { path : '/home', alias: '/', component: AllPosts },
-    { path : '/manage-posts', component: ManagePosts }
+    { path : '/home', alias: '/', component: FrontPage },
+    { path : '/manage-posts', component: ManagePosts },
+    { path : '/archive', component: AllPosts }
 ]
 
 const router = new VueRouter({

@@ -31,9 +31,10 @@ export default{
 </script>
 
 <style>
+
 #posts{
     width: 95%;
-    margin: 0 auto;
+    margin: 10px auto;
 
 }
 

@@ -1,5 +1,5 @@
 <template>
-    <div id="manage-posts">
+    <div v-if="user.isAdmin" id="manage-posts">
         <modal-box v-if="showDeleteModal" :post="postInForm" @close="showDeleteModal = false" @remove="removePost"></modal-box>
         <div id="manage-posts-header">
             <h1>Manage Posts</h1>
@@ -74,6 +74,9 @@ const initialData = () => {
         },
         posts: [],
         drafts: [],
+        user: {
+            isAdmin: true
+        },
         compiledMarkdown: '',
         showDeleteModal: false,
         sortOrder: 'desc'
@@ -115,7 +118,6 @@ export default {
             }else{
                 const index = this.posts.findIndex((p) => p.id === post.id);
                 if (index !== -1){
-                    console.log('this is a post')
                     this.resetPostInForm();
                     var json_post = JSON.stringify(post);
                     var url = 'http://192.168.1.107:5000/api/blog/posts/' + post.entry_id
@@ -126,21 +128,13 @@ export default {
                     
                 } else {
                     if(post.title != '' && post.body != ''){
-                        console.log('this is going too')
                         this.resetPostInForm();
                         post.id = "";
                         post = JSON.stringify(post)
-                        console.log(post)
                         axios.post('http://192.168.1.107:5000/api/blog/posts', post)
                             .then(function (response){
-                                console.log(response + ' success');
                                 self.getPosts()
                             })
-
-                    }
-                    else{
-                        console.log('title is null')
-                        console.log(JSON.stringify(post))
                     }
                 }
             }
@@ -174,7 +168,7 @@ export default {
         saveDraft(draft){
             draft.isDraft = true;
             draft.isActive = false;
-            draft.summary = removeMd(draft.body).substring(0, 139) + '...'
+            draft.summary = removeMd(draft.body).substring(0, 300) + '...'
             if(draft.id){
                 const index = this.drafts.findIndex((p) => p.id === draft.id);
 
@@ -195,13 +189,11 @@ export default {
 
             if(!post.isDraft){
                 if (pindex == -1){
-                    console.log('deleting post')
                     this.posts.splice(pindex, 1)
                     var url = 'http://192.168.1.107:5000/api/blog/posts/' + post.entry_id
                     var self = this
                     axios.delete(url)
                             .then(function (response){
-                                console.log(response + ' success');
                                 self.getPosts()
                             })
                 }
@@ -250,7 +242,6 @@ export default {
         },
         getPosts: function(){
             this.posts = []
-            console.log('getting posts...')
             axios.get('http://192.168.1.107:5000/api/blog/posts')
                 .then((response) => {
                     response.data.sort(function(a, b){
@@ -259,7 +250,7 @@ export default {
                         return 0;
                     }).reverse()
                     response.data.forEach((post) => {
-                        post.summary = removeMd(post.body).substring(0, 139) + '...'
+                        post.summary = removeMd(post.body).substring(0, 300) + '...'
                         post.isActive = false;
                         this.posts.push(post)
                         })

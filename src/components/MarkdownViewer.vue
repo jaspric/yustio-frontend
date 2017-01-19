@@ -86,25 +86,28 @@ export default {
   border: 1px solid #BDBDBD;
 }
 
+#markdown-container{
+  line-height: 1.8em;
+}
 #markdown-container code {
     background-color: #2d2d2d;
     color: #cccccc;
     font-family: Consolas, "Courier new";
     padding: 2px 4px;
     border-radius: 4px;
-    font-size: 90%;
 }
 
 #markdown-container blockquote {
   background-color: #F5F5F5;
   box-shadow: 0 3px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,0.24);
   padding: 5px 25px 5px 60px;
-  padding-left
-  line-height: 1.2;
+  line-height: 1.5;
   text-align: justify;
   border-left: 6px solid #1A8DFF;
   position: relative;
   min-height: 54px;
+  font-size: 1.5em;
+  font-family: "Roboto Slab", serif;
 }
 
 #markdown-container blockquote::before{
@@ -115,7 +118,7 @@ export default {
   color: #999;
   position: absolute;
   left: 10px;
-  top: 5px;
+  top: 0px;
   }
 
 .hljs-emphasis {

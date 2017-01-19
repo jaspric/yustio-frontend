@@ -6,7 +6,7 @@
                 <ul id="nav-items">
                     <router-link to="home" tag="li" class="nav-item" exact><a>Home</a></router-link>
                     <router-link to="about" tag="li" class="nav-item" exact><a>About</a></router-link>
-                    <router-link to="post-archive" tag="li" class="nav-item" exact><a>Archive</a></router-link>
+                    <router-link to="archive" tag="li" class="nav-item" exact><a>Archive</a></router-link>
                     <router-link v-if="user.isAdmin" to="manage-posts" tag="li" class="nav-item" exact><a>Manage Posts</a></router-link>
                     <router-link v-if="user.isAuthenticated" to="logout" tag="li" class="nav-item"><span v-if="user.isAuthenticated"><a>Logout</a></span></router-link>
                 </ul>
@@ -84,8 +84,7 @@ a:hover{
      box-shadow: 0 -4px 0 0 #1A8DFF inset;
 }
 
-@media only screen 
-  and (max-device-width: 1024px) {
+@media screen only and (max-width: 1024px) {
     #nav-items{
         
     }
