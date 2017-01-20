@@ -4,11 +4,10 @@
             <div id="nav">
                 <a href="#"><h2 id="brand">yust.io</h2></a>
                 <ul id="nav-items">
-                    <router-link to="home" tag="li" class="nav-item" exact><a>Home</a></router-link>
-                    <router-link to="about" tag="li" class="nav-item" exact><a>About</a></router-link>
-                    <router-link to="archive" tag="li" class="nav-item" exact><a>Archive</a></router-link>
-                    <router-link v-if="user.isAdmin" to="manage-posts" tag="li" class="nav-item" exact><a>Manage Posts</a></router-link>
-                    <router-link v-if="user.isAuthenticated" to="logout" tag="li" class="nav-item"><span v-if="user.isAuthenticated"><a>Logout</a></span></router-link>
+                    <router-link to="/" tag="li" class="nav-item" exact><a>Home</a></router-link>
+                    <router-link to="/about" tag="li" class="nav-item" exact><a>About</a></router-link>
+                    <router-link v-if="user.isAdmin" to="/manage-posts" tag="li" class="nav-item" exact><a>Manage Posts</a></router-link>
+                    <router-link v-if="user.isAuthenticated" to="/logout" tag="li" class="nav-item" exact><span v-if="user.isAuthenticated"><a>Logout</a></span></router-link>
                 </ul>
             </div>
         </div>
@@ -54,12 +53,12 @@ export default{
     margin: 15px 20px;
 }
 
-a, a:visited{
+#nav a, #nav a:visited{
     color: #FAFAFA;
     text-decoration: none;
 }
 
-a:hover{
+#nav a:hover{
     color: #E3F2FD;
 }
 
@@ -80,7 +79,7 @@ a:hover{
     box-shadow: 0 -4px 0 0 #1A8DFF inset;
 }
 
-.router-link-active{
+#nav-items>.router-link-active{
      box-shadow: 0 -4px 0 0 #1A8DFF inset;
 }
 

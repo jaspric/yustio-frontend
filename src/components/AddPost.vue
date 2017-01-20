@@ -28,11 +28,10 @@ export default {
     props: ['post'],
     methods: {
         onSubmit(){
-            this.post.author = 'Yust Test';
             this.$emit('submit', this.post);
         },
         saveDraft(){
-            this.post.author = 'Yust Test';
+            this.post.author = 'Jason';
             this.post.created = moment().format('MMM DD, YYYY [ at ] hh:mm a')
             this.$emit('save', this.post);
         },

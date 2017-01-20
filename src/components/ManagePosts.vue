@@ -245,8 +245,8 @@ export default {
             axios.get('http://192.168.1.107:5000/api/blog/posts')
                 .then((response) => {
                     response.data.sort(function(a, b){
-                        if(a.created < b.created) return -1;
-                        if(a.created > b.created) return 1;
+                        if(a.entry_id < b.entry_id) return -1;
+                        if(a.entry_id > b.entry_id) return 1;
                         return 0;
                     }).reverse()
                     response.data.forEach((post) => {
@@ -261,15 +261,15 @@ export default {
                 if(this.sortOrder == 'desc'){
                     this.sortOrder = 'asc'
                     return this.posts.sort(function(a,b){
-                        if(a.created < b.created) return -1;
-                        if(a.created > b.created) return 1;
+                        if(a.entry_id < b.entry_id) return -1;
+                        if(a.entry_id > b.entry_id) return 1;
                         return 0;
                     })
                 } else {
                     this.sortOrder = 'desc'
                     return this.posts.sort(function(a,b){
-                        if(a.created > b.created) return -1;
-                        if(a.created < b.created) return 1;
+                        if(a.entry_id > b.entry_id) return -1;
+                        if(a.entry_id < b.entry_id) return 1;
                         return 0;
                     })
                 }

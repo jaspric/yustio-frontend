@@ -30,6 +30,9 @@ h1, h2, h3, h4, h5{
   margin: 2px;
 }
 
+a{
+  text-decoration: none;
+}
 body{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

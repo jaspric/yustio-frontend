@@ -78,7 +78,7 @@ export default {
   color: #cccccc;
   padding: 9.5px;
   font-family: Consolas, "Courier new";
-  width: 100%;
+  width: 80%;
   border-radius: 4px;
   margin: 25px auto;
   max-height: 300px;

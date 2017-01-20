@@ -20,11 +20,17 @@
 </template>
 
 <script>
+var moment = require('moment');
 export default{
     props: ['posts'],
     methods: {
         onEdit(post){
             this.$emit('edit', post)
+        }
+    },
+    mounted(){
+        for(var i = 0; i<this.posts.length; i++){
+            this.posts[i].created = moment(Date.parse(this.posts[i].created)).format('YYYY/MM/DD, h:mm:ss a')
         }
     }
 }
